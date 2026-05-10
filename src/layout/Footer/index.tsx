@@ -4,6 +4,6 @@ import type { IBaseProps } from "@/utils";
 
 export interface IFooterProps extends IBaseProps {}
 
-export default React.memo(() => {
-  return <div className={styles.wrapper}></div>;
+export default React.memo(({ children }: IFooterProps) => {
+  return <div className={styles.wrapper}>{children}</div>;
 });
