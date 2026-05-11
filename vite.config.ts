@@ -10,6 +10,9 @@ export default defineConfig({
     },
   },
   css: {
+    modules: {
+      localsConvention: "camelCase",
+    },
     preprocessorOptions: {
       less: {
         additionalData: `@import "@/styles/mixin.less";`,
