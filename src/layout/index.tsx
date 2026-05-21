@@ -3,7 +3,6 @@ import styles from "./index.module.less";
 import Header from "./Header";
 import Content from "./Content";
 import Footer from "./Footer";
-
 export interface ILayoutProps {
   header: {
     has: boolean;

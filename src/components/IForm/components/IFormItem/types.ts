@@ -1,4 +1,6 @@
 import type { IBaseProps } from "@/utils";
+import type { ChangeEvent } from "react";
+import type React from "react";
 
 export interface IFormItemConfig {
   key: string;
@@ -11,9 +13,16 @@ export interface IFormItemConfig {
   max?: number;
   min?: number;
   layout: "vertical" | "horizontal" | "nolabel";
-  immediate: boolean;
-  [attr: string]: any;
+  ["data-immediate"]: boolean;
 }
 export interface IFormItemProps extends IBaseProps {
-  itemConfig: IFormItemConfig;
+  itemConfig: Array<IFormItemConfig>;
+  handleChange: (
+    e: ChangeEvent<HTMLInputElement>,
+    value: IFormItemConfig,
+  ) => void;
+}
+export interface IFormOperationBtnsProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  btnName: string;
+  btnIndex: number;
 }

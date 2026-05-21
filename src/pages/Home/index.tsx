@@ -1,12 +1,23 @@
-import React from "react";
+import React, { type ChangeEvent } from "react";
 import styles from "./index.module.less";
 import type { IBaseProps } from "@/utils";
 import Map from "@/components/Map";
 import { Layout } from "@/layout";
+import IForm from "@/components/IForm";
+import { formConfig } from "./formConfig";
+import type { IFormItemConfig } from "@/components/IForm/components/IFormItem/types";
 
 export interface IHomeProps extends IBaseProps {}
 
 export default React.memo(() => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    value: IFormItemConfig,
+  ) => {
+    console.log(e);
+    console.log(value);
+  };
+
   return (
     <div className={styles.wrapper}>
       <Layout
@@ -19,45 +30,7 @@ export default React.memo(() => {
             <div className={styles.contentPanel}>
               <div className={styles.leftPanel}>
                 <div className="sidebar">
-                  <div className="control-group">
-                    <label>请选择范围</label>
-                    <input
-                      type="file"
-                      id="mainAreaFile"
-                      accept=".geojson,.json"
-                    />
-                    <div className="status-card" id="mainStatus">
-                      未加载范围
-                    </div>
-                  </div>
-
-                  <div className="control-group">
-                    <label>可选-请输入障碍区域-支持多选</label>
-                    <input
-                      type="file"
-                      id="avoidFile"
-                      accept=".geojson,.json"
-                      multiple
-                    />
-                  </div>
-
-                  <div className="control-group">
-                    <label>需要生成的多边形数量</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="300"
-                      value="40"
-                      step="1"
-                    />
-                  </div>
-
-                  <div className="control-group">
-                    <button id="generateBtn">随机生成</button>
-                    <button id="downloadBtn" className="download" disabled>
-                      保存
-                    </button>
-                  </div>
+                  <IForm configs={formConfig} onChange={handleChange} />
                 </div>
               </div>
               <div className={styles.mapPanel}>
