@@ -10,10 +10,18 @@ import type { IFormItemConfig } from "@/components/IForm/components/IFormItem/ty
 export interface IHomeProps extends IBaseProps {}
 
 export default React.memo(() => {
+  const [formVal, setFormVal] = React.useState({});
+  const selectedRegionChange = (regionName: string) => {
+    console.log("当前选中的行政区划为", regionName);
+  };
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement>,
     value: IFormItemConfig,
   ) => {
+    if (value.key === "'cannot-work-area'") {
+      addGeoFence(e.target.files);
+    }
     console.log(e);
     console.log(value);
   };
@@ -34,7 +42,7 @@ export default React.memo(() => {
                 </div>
               </div>
               <div className={styles.mapPanel}>
-                <Map />
+                <Map selectedRegionChange={selectedRegionChange} />
               </div>
             </div>
           ),

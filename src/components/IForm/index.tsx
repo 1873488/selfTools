@@ -3,7 +3,6 @@ import styles from "./index.module.less";
 import type { IBaseProps } from "@/utils";
 import type { IFormItemConfig } from "./components/IFormItem/types";
 import classNames from "classnames";
-import { useMemoizedFn, useThrottle } from "ahooks";
 import IFormItem from "./components/IFormItem";
 
 export interface IFormProps extends IBaseProps {
@@ -40,7 +39,7 @@ export default React.memo(
       item: IFormItemConfig,
     ) => {
       console.log(e);
-      onChange?.(item);
+      onChange?.(e, item);
     };
     return (
       <form className={styles.form} onSubmit={_onSave} onReset={_onCancel}>
