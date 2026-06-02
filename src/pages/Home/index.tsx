@@ -6,24 +6,25 @@ import { Layout } from "@/layout";
 import IForm from "@/components/IForm";
 import { formConfig } from "./formConfig";
 import type { IFormItemConfig } from "@/components/IForm/components/IFormItem/types";
+import { getFilesContent, integration } from "./utils";
 
 export interface IHomeProps extends IBaseProps {}
 
 export default React.memo(() => {
-  const [formVal, setFormVal] = React.useState({});
   const selectedRegionChange = (regionName: string) => {
     console.log("当前选中的行政区划为", regionName);
   };
 
-  const handleChange = (
+  const handleChange = async (
     e: ChangeEvent<HTMLInputElement>,
     value: IFormItemConfig,
   ) => {
-    if (value.key === "'cannot-work-area'") {
-      addGeoFence(e.target.files);
+    if (value.key === "cannot-work-area") {
+      const asyncFilesContent = await getFilesContent(e.target.files);
+      const filesContent = await Promise.all(asyncFilesContent);
+      const geojson = integration(filesContent);
+      console.log("整合后的geojson", geojson);
     }
-    console.log(e);
-    console.log(value);
   };
 
   return (
