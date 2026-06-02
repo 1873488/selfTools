@@ -7,29 +7,28 @@ import IFormItem from "./components/IFormItem";
 
 export interface IFormProps extends IBaseProps {
   className?: string;
-  onSave?: (data: any) => void;
+  onSave?: (data: Record<string, FormDataEntryValue>) => void;
   onCancel?: () => void;
   onChange: (e: ChangeEvent<HTMLInputElement>, value: IFormItemConfig) => void;
   showOperationBtns?: boolean;
   configs: IFormItemConfig[][];
 }
 
-export default React.memo(
-  ({
+export default React.memo(function IForm({
     onSave,
     onCancel,
     onChange,
     configs,
     showOperationBtns = true,
     className,
-  }: IFormProps) => {
+  }: IFormProps) {
     const _onCancel = () => {
       onCancel?.();
     };
     const _onSave = (e: React.SubmitEvent<HTMLFormElement>) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      const data: Record<string, any> = {};
+      const data: Record<string, FormDataEntryValue> = {};
       for (const [key, value] of formData.entries()) {
         data[key] = value;
       }

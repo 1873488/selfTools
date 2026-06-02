@@ -1,32 +1,43 @@
 import { featureCollection, getCoords, feature } from "@turf/turf";
+type TurfFeature = ReturnType<typeof feature>;
 // 读取文件内容再返回
 export const getFilesContent = (
   files: FileList | null,
-): Promise<Promise<{ fileName: string; content: string }>[]> => {
+): Promise<{ fileName: string; content: string }[]> => {
   return new Promise((resolve, reject) => {
-    let promises: Promise<{ fileName: string; content: string }>[] = [];
-    if (files instanceof FileList) {
-      const filelistLength = files.length;
-      let index = 0;
-      while (index < filelistLength) {
-        const file = files.item(index);
-        if (!file) continue;
-        promises.push(
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsText(file);
-            reader.onload = (e) => {
-              resolve({
-                fileName: file.name,
-                content: (e.target?.result as string) ?? "{}",
-              });
-            };
-          }),
-        );
-        index++;
+    if (!(files instanceof FileList)) {
+      reject("没有文件被选中");
+      return;
+    }
+
+    const promises: Promise<{ fileName: string; content: string }>[] = [];
+    for (let index = 0; index < files.length; index++) {
+      const file = files.item(index);
+      if (!file) {
+        continue;
       }
-      resolve(promises);
-    } else reject("没有文件被选中");
+
+      promises.push(
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsText(file);
+          reader.onload = (e) => {
+            resolve({
+              fileName: file.name,
+              content: (e.target?.result as string) ?? "{}",
+            });
+          };
+          reader.onerror = () => {
+            resolve({
+              fileName: file.name,
+              content: "{}",
+            });
+          };
+        }),
+      );
+    }
+
+    Promise.all(promises).then(resolve).catch(reject);
   });
 };
 // 整合多个geojson文件内容为一个featureCollection
@@ -34,13 +45,13 @@ export const integration = (
   contents: { fileName: string; content: string }[],
 ): ReturnType<typeof featureCollection> => {
   const geojson = featureCollection([]);
-  let _features: ReturnType<typeof feature>[] = [];
+  const _features: TurfFeature[] = [];
   contents.forEach(({ fileName, content }) => {
     const thisContent = JSON.parse(content);
-    console.log(fileName, JSON.parse(content));
+    console.log(fileName, thisContent);
     switch (thisContent.type) {
       case "FeatureCollection":
-        thisContent.features.forEach((feature: any) => {
+        thisContent.features.forEach((feature: TurfFeature) => {
           feature.properties = {
             ...feature.properties,
             fileName,

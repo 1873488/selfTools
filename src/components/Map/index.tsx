@@ -1,39 +1,37 @@
 import React from "react";
 import styles from "./index.module.less";
-import type { IBaseProps } from "@/utils";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-export interface IMapProps extends IBaseProps {}
+import type { Feature, Geometry } from "geojson";
 import subRegion from "@/assets/subRegion.json";
 import { featureCollection } from "@turf/turf";
-export default React.memo(
-  ({
+export default React.memo(function Map({
     selectedRegionChange,
   }: {
     selectedRegionChange: (regionName: string) => void;
-  }) => {
+  }) {
     const mapWrapperRef = React.useRef<HTMLDivElement>(null);
     React.useEffect(() => {
       // 禁用右键菜单
-      window.document.oncontextmenu = function () {
-        return false;
-      };
+      const originContextMenu = window.document.oncontextmenu;
+      window.document.oncontextmenu = () => false;
       let lastHoveFeature: string = null!;
       let selectedRegion: string = null!;
-      let regionLayer: L.GeoJSON = L.geoJSON(null, {
+      const regionLayer: L.GeoJSON = L.geoJSON(null, {
         style: {
           color: "#915",
           weight: 1,
           fillColor: "#fff",
         },
         filter: (feature) => {
-          if (selectedRegion) {
-            if (feature.properties.gb.startsWith(targetGb)) return true;
-            else false;
-          } else return true;
+          if (!selectedRegion) {
+            return true;
+          }
+          const targetGb = selectedRegion.replace(/0+$/g, "");
+          return feature.properties.gb.startsWith(targetGb);
         },
       });
-      let subRegionLayer: L.GeoJSON = L.geoJSON(null, {
+      const subRegionLayer: L.GeoJSON = L.geoJSON(null, {
         style: {
           color: "#985",
           weight: 1,
@@ -77,9 +75,11 @@ export default React.memo(
         selectedRegion = String(e.sourceTarget.feature.properties.gb);
         selectedRegionChange(e.sourceTarget.feature.properties.name);
         const targetGb = selectedRegion.replace(/0+$/g, "");
-        const filteredFeatures = subRegion!.features?.filter((r) =>
-          r.properties.gb.startsWith(targetGb),
-        );
+        const filteredFeatures = (subRegion!.features ?? []).filter(
+          (r) =>
+            typeof r.properties?.gb === "string" &&
+            r.properties.gb.startsWith(targetGb),
+        ) as Feature<Geometry, { name: string; gb: string }>[];
         subRegionLayer.clearLayers();
         subRegionLayer.addData(featureCollection(filteredFeatures));
       });
@@ -89,6 +89,7 @@ export default React.memo(
         subRegionLayer.clearLayers();
       });
       return () => {
+        window.document.oncontextmenu = originContextMenu;
         regionLayer?.off("mouseover");
         regionLayer?.off("mouseout");
         regionLayer?.off("click");
@@ -97,7 +98,7 @@ export default React.memo(
         subRegionLayer?.remove();
         map.remove();
       };
-    }, []);
+    }, [selectedRegionChange]);
 
     return <div ref={mapWrapperRef} className={styles.wrapper}></div>;
   },

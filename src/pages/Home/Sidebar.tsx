@@ -12,15 +12,15 @@ export interface ISidebarProps {
   onSubmit?: () => void;
 }
 
-export default React.memo(
-  ({
+export default React.memo(function Sidebar(
+  {
     configs,
     onChange,
     filesContent = [],
     onFilesContentChange,
     onReset,
     onSubmit,
-  }: ISidebarProps) => {
+  }: ISidebarProps) {
     const handleDelete = (index: number) => {
       const next = filesContent.filter((_, i) => i !== index);
       onFilesContentChange(next);
@@ -80,5 +80,5 @@ export default React.memo(
         </div>
       </div>
     );
-  },
+  }
 );

@@ -2,11 +2,8 @@ import React, { type ChangeEvent } from "react";
 import styles from "./index.module.less";
 import type { IFormItemConfig, IFormItemProps } from "./types";
 import classNames from "classnames";
-import { omit } from "lodash";
-export default React.memo(
-  ({ itemConfig = [], handleChange }: IFormItemProps) => {
+export default React.memo(function IFormItem({ itemConfig = [], handleChange }: IFormItemProps) {
     // 处理change事件 设置为immeadiate为false时 阻止事件冒泡避免被上级组件捕获
-    const inputRef = React.useRef<HTMLInputElement>(null);
     // 表单就只做数据录入！
     const _handleChange = (
       e: ChangeEvent<HTMLInputElement>,
@@ -27,17 +24,27 @@ export default React.memo(
           >
             <div className={classNames(styles.label)}>{item.describe}</div>
             <div className={classNames(styles.input)}>
-              <input
-                {...omit(item, ["key"])}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  _handleChange(e, item)
-                }
-                ref={inputRef}
-              />
+              {(() => {
+                const inputProps = { ...item } as Record<string, unknown>;
+                delete inputProps.key;
+                delete inputProps.describe;
+                delete inputProps.layout;
+                return (
+                  <input
+                    {...(inputProps as Omit<
+                      IFormItemConfig,
+                      "key" | "describe" | "layout"
+                    >)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      _handleChange(e, item)
+                    }
+                  />
+                );
+              })()}
             </div>
           </div>
         ))}
       </div>
     );
-  },
+},
 );

@@ -1,17 +1,14 @@
 import React, { type ChangeEvent } from "react";
 import styles from "./index.module.less";
-import type { IBaseProps } from "@/utils";
 import Map from "@/components/Map";
 import { Layout } from "@/layout";
 import { formConfig } from "./formConfig";
 import type { IFormItemConfig } from "@/components/IForm/components/IFormItem/types";
 import { getFilesContent, integration } from "./utils";
 
-export interface IHomeProps extends IBaseProps {}
-
 import Sidebar from "./Sidebar";
 
-export default React.memo(() => {
+export default React.memo(function HomePage() {
   const selectedRegionChange = (regionName: string) => {
     console.log("当前选中的行政区划为", regionName);
   };
@@ -25,8 +22,7 @@ export default React.memo(() => {
     value: IFormItemConfig,
   ) => {
     if (value.key === "cannot-work-area") {
-      const asyncFilesContent = await getFilesContent(e.target.files);
-      const resolved = await Promise.all(asyncFilesContent);
+      const resolved = await getFilesContent(e.target.files);
       setFilesContent(resolved);
       const geojson = integration(resolved);
       console.log("整合后的geojson", geojson);

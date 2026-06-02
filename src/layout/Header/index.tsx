@@ -1,9 +1,10 @@
 import React from "react";
 import styles from "./index.module.less";
-import type { IBaseProps } from "@/utils";
 
-export interface IHeaderProps extends IBaseProps {}
+export type IHeaderProps = {
+  children?: React.ReactNode;
+};
 
-export default React.memo(({ children }: IHeaderProps) => {
+export default React.memo(function Header({ children }: IHeaderProps) {
   return <div className={styles.wrapper}>{children}</div>;
 });

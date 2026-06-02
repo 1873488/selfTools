@@ -1,9 +1,10 @@
 import React from "react";
 import styles from "./index.module.less";
-import type { IBaseProps } from "@/utils";
 
-export interface IContentProps extends IBaseProps {}
+export type IContentProps = {
+  children?: React.ReactNode;
+};
 
-export default React.memo(({ children }: IContentProps) => {
+export default React.memo(function Content({ children }: IContentProps) {
   return <div className={styles.wrapper}>{children}</div>;
 });
