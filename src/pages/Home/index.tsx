@@ -3,17 +3,22 @@ import styles from "./index.module.less";
 import type { IBaseProps } from "@/utils";
 import Map from "@/components/Map";
 import { Layout } from "@/layout";
-import IForm from "@/components/IForm";
 import { formConfig } from "./formConfig";
 import type { IFormItemConfig } from "@/components/IForm/components/IFormItem/types";
 import { getFilesContent, integration } from "./utils";
 
 export interface IHomeProps extends IBaseProps {}
 
+import Sidebar from "./Sidebar";
+
 export default React.memo(() => {
   const selectedRegionChange = (regionName: string) => {
     console.log("当前选中的行政区划为", regionName);
   };
+
+  const [filesContent, setFilesContent] = React.useState<
+    { fileName: string; content: string }[]
+  >([]);
 
   const handleChange = async (
     e: ChangeEvent<HTMLInputElement>,
@@ -21,10 +26,34 @@ export default React.memo(() => {
   ) => {
     if (value.key === "cannot-work-area") {
       const asyncFilesContent = await getFilesContent(e.target.files);
-      const filesContent = await Promise.all(asyncFilesContent);
-      const geojson = integration(filesContent);
+      const resolved = await Promise.all(asyncFilesContent);
+      setFilesContent(resolved);
+      const geojson = integration(resolved);
       console.log("整合后的geojson", geojson);
     }
+  };
+
+  const handleFilesContentChange = (contents: { fileName: string; content: string }[]) => {
+    setFilesContent(contents);
+    if (contents.length > 0) {
+      const geojson = integration(contents);
+      console.log("整合后的geojson（来自侧边栏变更）", geojson);
+    }
+  };
+
+  const handleReset = () => {
+    console.log("重置表单");
+    setFilesContent([]);
+  };
+
+  const handleSubmit = () => {
+    if (filesContent.length === 0) {
+      console.warn("请先上传文件");
+      return;
+    }
+    console.log("开始生成，当前文件列表：", filesContent);
+    const geojson = integration(filesContent);
+    console.log("最终生成的geojson", geojson);
   };
 
   return (
@@ -38,9 +67,14 @@ export default React.memo(() => {
           content: (
             <div className={styles.contentPanel}>
               <div className={styles.leftPanel}>
-                <div className="sidebar">
-                  <IForm configs={formConfig} onChange={handleChange} />
-                </div>
+                <Sidebar
+                  configs={formConfig}
+                  onChange={handleChange}
+                  filesContent={filesContent}
+                  onFilesContentChange={handleFilesContentChange}
+                  onReset={handleReset}
+                  onSubmit={handleSubmit}
+                />
               </div>
               <div className={styles.mapPanel}>
                 <Map selectedRegionChange={selectedRegionChange} />

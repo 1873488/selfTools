@@ -6,6 +6,7 @@ import classNames from "classnames";
 import IFormItem from "./components/IFormItem";
 
 export interface IFormProps extends IBaseProps {
+  className?: string;
   onSave?: (data: any) => void;
   onCancel?: () => void;
   onChange: (e: ChangeEvent<HTMLInputElement>, value: IFormItemConfig) => void;
@@ -20,6 +21,7 @@ export default React.memo(
     onChange,
     configs,
     showOperationBtns = true,
+    className,
   }: IFormProps) => {
     const _onCancel = () => {
       onCancel?.();
@@ -42,7 +44,11 @@ export default React.memo(
       onChange?.(e, item);
     };
     return (
-      <form className={styles.form} onSubmit={_onSave} onReset={_onCancel}>
+      <form
+        className={classNames(styles.form, className)}
+        onSubmit={_onSave}
+        onReset={_onCancel}
+      >
         {configs.map((row, index) => (
           <IFormItem
             key={`form-item-${index}`}
