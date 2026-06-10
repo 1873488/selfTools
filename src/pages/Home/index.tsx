@@ -5,13 +5,13 @@ import { Layout } from "@/layout";
 import { formConfig } from "./formConfig";
 import type { IFormItemConfig } from "@/components/IForm/components/IFormItem/types";
 import { getFilesContent, integration } from "./utils";
-
 import Sidebar from "./Sidebar";
+import { useMemoizedFn } from "ahooks";
 
 export default React.memo(function HomePage() {
-  const selectedRegionChange = (regionName: string) => {
+  const selectedRegionChange = useMemoizedFn((regionName: string) => {
     console.log("当前选中的行政区划为", regionName);
-  };
+  });
 
   const [filesContent, setFilesContent] = React.useState<
     { fileName: string; content: string }[]
@@ -29,7 +29,9 @@ export default React.memo(function HomePage() {
     }
   };
 
-  const handleFilesContentChange = (contents: { fileName: string; content: string }[]) => {
+  const handleFilesContentChange = (
+    contents: { fileName: string; content: string }[],
+  ) => {
     setFilesContent(contents);
     if (contents.length > 0) {
       const geojson = integration(contents);
@@ -47,9 +49,7 @@ export default React.memo(function HomePage() {
       console.warn("请先上传文件");
       return;
     }
-    console.log("开始生成，当前文件列表：", filesContent);
     const geojson = integration(filesContent);
-    console.log("最终生成的geojson", geojson);
   };
 
   return (
